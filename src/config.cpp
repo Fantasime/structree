@@ -76,12 +76,12 @@ bool structree::Config::hasNextInputfile() {
 
 std::ifstream& structree::Config::loadNextInputfile() {
     if (!hasNextInputfile())
-        throw std::runtime_error((std::string)(__func__) + ": No input file.");
+        throw std::runtime_error((std::string)(__func__) + ": No input files.");
 
     inputFile.close();
     outputFile.close();
     inputFile.open(options["-f"][inputFileIndex], std::ifstream::in);
-    outputFile.open(options["-f"][inputFileIndex] + ".out", std::ofstream::out);
+    outputFile.open(options["-f"][inputFileIndex] + ".structree", std::ofstream::out);
     filename = parseFilename(options["-f"][inputFileIndex]);
 
     // // Set outputfile

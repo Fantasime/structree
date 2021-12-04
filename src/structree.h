@@ -22,7 +22,7 @@ namespace structree {
 
 class StructreeNode {
   private:
-    bool hasNextEquativeNode;
+    bool hasNextEquativeNode;  // 是否存在下一个同层节点
     std::string::size_type level;
     std::string content;
 

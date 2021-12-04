@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10.2)
 
 project(structree)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED 11)
 
 set(CMAKE_BUILD_TYPE "Debug")
 

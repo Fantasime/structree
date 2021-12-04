@@ -83,16 +83,7 @@ void structree::StructreeBuilder::build(const std::string& treeName, std::istrea
 
     // 输出
     std::vector<StructreeNode> lastLevelNodes;
-
-    //=====DEBUG=====
-    //====OUT LOG====
-    std::ofstream log;
-    log.open("structree.log", std::ostream::out);
-    //===============
-
     for (auto node : nodes) {
-        log << node.getLevel() << ' ' << node.getContent() << ' ' << node.getHasNextEqual()
-            << std::endl;
         // 进层
         if (!lastLevelNodes.empty() && node.getLevel() > lastLevelNodes.back().getLevel()) {
             if (lastLevelNodes.back().getHasNextEqual())
@@ -212,6 +203,17 @@ bool structree::StructreeBuilder::addToNodes(std::string& str) {
     return true;
 }
 
+
+
+/*
+*   @function: trim(): void
+*   @brief: 根据前后节点的关系对节点的hasNextEquativeLevel属性进行处理
+*
+*   @author: Fantasime
+*
+*   @date: 2021/12/4
+*   @last update: 2021/12/4
+*/
 void structree::StructreeBuilder::trim() {
     std::string::size_type minLevel = SIZE_MAX;
     std::map<std::string::size_type, bool> vis;
@@ -228,43 +230,3 @@ void structree::StructreeBuilder::trim() {
         }
     }
 }
-
-/*
-inputFile
-    |
-    +-AAA
-    |  |
-    |  +-BBB
-    |  |
-    |  +-CCC
-    |  |  |
-    |  |  +-ZZZ
-    |  |
-    |  +-DDD
-    |
-    +-EEE
-    |  |
-    |  +-FFF
-    |  |
-    |  +-GGG
-    |  |
-    |  +-HHH
-    |
-    +-III
-
-规定:
-若当前节点比上一节点的层级大, 可以且只能相差1
-节点的content可以为空
-
-1 2 2 2 3 2 1 2 2 2 1
-1 1 1 1 0 0 1 1 1 0 0
-
-1 2 2 3 1 2 2 2 1
-1 1 0 0 1 1 1 0 0
-
-1 2 3 2 1 2 3 2 2
-1 1 0 0 0 1 0 1 0
-
-1 2 3 4 1
-1 0 0 0 0
-*/
