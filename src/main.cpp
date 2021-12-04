@@ -1,6 +1,8 @@
 #include <config.h>
 #include <structree.h>
 
+#include <memory>
+
 int main(int argc, char* argv[]) {
     std::unique_ptr<structree::Config> config = std::make_unique<structree::Config>(argc, argv);
     std::unique_ptr<structree::StructreeBuilder> structreeBuilder =

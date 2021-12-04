@@ -22,7 +22,7 @@ namespace structree {
 
 class StructreeNode {
   private:
-    bool hasNextEquativeNode;
+    bool hasNextEquativeNode;  // 是否存在下一个同层结点
     std::string::size_type level;
     std::string content;
 
@@ -44,10 +44,10 @@ class StructreeBuilder {
   private:
     char levelTagChar;                 // 层级标记字符 默认为'#'
     char trunkChar;                    // 树干字符 默认为为'|'
-    char nodeChar;                     // 节点字符 默认为'+'
+    char nodeChar;                     // 结点字符 默认为'+'
     char branchChar;                   // 分支字符 默认为'-'
     std::string prefixPrinter;         // 存储需要打印的trunk和空格前缀
-    std::vector<StructreeNode> nodes;  // 存储处理后的输入流中的节点
+    std::vector<StructreeNode> nodes;  // 存储处理后的输入流中的结点
 
   public:
     StructreeBuilder();

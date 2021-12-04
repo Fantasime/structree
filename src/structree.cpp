@@ -71,28 +71,19 @@ void structree::StructreeBuilder::build(const std::string& treeName, std::istrea
     prefixPrinter.clear();
     prefixPrinter = std::string(getHalfStringLength(treeName), ' ');
 
-    // 将输入流中的字符串处理成节点并保存在nodes中
+    // 将输入流中的字符串处理成结点并保存在nodes中
     std::string inputString;
     nodes.clear();
     while (std::getline(input, inputString)) {
         addToNodes(inputString);
     }
 
-    // 设定各节点的hasNextEquativeNode属性
+    // 设定各结点的hasNextEquativeNode属性
     trim();
 
     // 输出
     std::vector<StructreeNode> lastLevelNodes;
-
-    //=====DEBUG=====
-    //====OUT LOG====
-    std::ofstream log;
-    log.open("structree.log", std::ostream::out);
-    //===============
-
     for (auto node : nodes) {
-        log << node.getLevel() << ' ' << node.getContent() << ' ' << node.getHasNextEqual()
-            << std::endl;
         // 进层
         if (!lastLevelNodes.empty() && node.getLevel() > lastLevelNodes.back().getLevel()) {
             if (lastLevelNodes.back().getHasNextEqual())
@@ -107,15 +98,17 @@ void structree::StructreeBuilder::build(const std::string& treeName, std::istrea
         // 退层
         else if (!lastLevelNodes.empty() && node.getLevel() < lastLevelNodes.back().getLevel()) {
             lastLevelNodes.pop_back();
-            prefixPrinter.erase(
-                prefixPrinter.size() -
-                ((size_t)(2) + getHalfStringLength(lastLevelNodes.back().getContent())));
-
-            while (!lastLevelNodes.empty() && node.getLevel() < lastLevelNodes.back().getLevel()) {
-                lastLevelNodes.pop_back();
+            if (!lastLevelNodes.empty())
                 prefixPrinter.erase(
                     prefixPrinter.size() -
                     ((size_t)(2) + getHalfStringLength(lastLevelNodes.back().getContent())));
+
+            while (!lastLevelNodes.empty() && node.getLevel() < lastLevelNodes.back().getLevel()) {
+                lastLevelNodes.pop_back();
+                if (!lastLevelNodes.empty())
+                    prefixPrinter.erase(
+                        prefixPrinter.size() -
+                        ((size_t)(2) + getHalfStringLength(lastLevelNodes.back().getContent())));
             }
         }
 
@@ -200,18 +193,29 @@ bool structree::StructreeBuilder::addToNodes(std::string& str) {
     std::string::size_type firstNotSpacePos = str.find_first_not_of(' ');
     str.erase(0, firstNotSpacePos);
 
-    // 与上一节点层级出现断层时, 使用空内容节点进行填充
+    // 与上一结点层级出现断层时, 使用空内容结点进行填充
     while (!nodes.empty() && level > nodes.back().getLevel() &&
            level - nodes.back().getLevel() > 1) {
         nodes.push_back(StructreeNode(nodes.back().getLevel() + 1, ""));
     }
 
-    // 构造节点
+    // 构造结点
     nodes.push_back(structree::StructreeNode(level, str));
 
     return true;
 }
 
+
+
+/*
+*   @function: trim(): void
+*   @brief: 根据前后结点的关系对结点的hasNextEquativeLevel属性进行处理
+*
+*   @author: Fantasime
+*
+*   @date: 2021/12/4
+*   @last update: 2021/12/4
+*/
 void structree::StructreeBuilder::trim() {
     std::string::size_type minLevel = SIZE_MAX;
     std::map<std::string::size_type, bool> vis;
@@ -228,43 +232,3 @@ void structree::StructreeBuilder::trim() {
         }
     }
 }
-
-/*
-inputFile
-    |
-    +-AAA
-    |  |
-    |  +-BBB
-    |  |
-    |  +-CCC
-    |  |  |
-    |  |  +-ZZZ
-    |  |
-    |  +-DDD
-    |
-    +-EEE
-    |  |
-    |  +-FFF
-    |  |
-    |  +-GGG
-    |  |
-    |  +-HHH
-    |
-    +-III
-
-规定:
-若当前节点比上一节点的层级大, 可以且只能相差1
-节点的content可以为空
-
-1 2 2 2 3 2 1 2 2 2 1
-1 1 1 1 0 0 1 1 1 0 0
-
-1 2 2 3 1 2 2 2 1
-1 1 0 0 1 1 1 0 0
-
-1 2 3 2 1 2 3 2 2
-1 1 0 0 0 1 0 1 0
-
-1 2 3 4 1
-1 0 0 0 0
-*/
