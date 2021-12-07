@@ -11,14 +11,8 @@
 *   @last update: 2021/12/1
 */
 structree::Config::Config(int argc, char* argv[]) : inputFileIndex(0) {
-    std::string currentOption = "-f";
     for (size_t i = 1; i < argc; i++) {
-        if (argv[i][0] == '-') {
-            currentOption = argv[i];
-            options[currentOption];  // add currentOption to map options
-        } else {
-            options[currentOption].push_back(argv[i]);
-        }
+        arguments.push_back(argv[i]);
     }
 
     parseArgus();
@@ -37,7 +31,7 @@ structree::Config::Config(int argc, char* argv[]) : inputFileIndex(0) {
 */
 void structree::Config::printUsage() {
     std::cout << "Usage:\n";
-    std::cout << "  structree file... [options]\n";
+    std::cout << "  structree [options] files...\n";
     std::cout << "Options:\n";
     std::cout << "  -h          Show usage" << std::endl;
     // std::cout << "  -o <path>   Set file output path" << std::endl;
@@ -55,7 +49,7 @@ void structree::Config::printUsage() {
 *   @last update: 2021/12/1
 */
 bool structree::Config::hasNextInputfile() {
-    return inputFileIndex < options["-f"].size();
+    return inputFileIndex < files.size();
 }
 
 
@@ -80,15 +74,15 @@ std::ifstream& structree::Config::loadNextInputfile() {
 
     inputFile.close();
     outputFile.close();
-    inputFile.open(options["-f"][inputFileIndex], std::ifstream::in);
-    outputFile.open(options["-f"][inputFileIndex] + ".structree", std::ofstream::out);
-    filename = parseFilename(options["-f"][inputFileIndex]);
 
-    // // Set outputfile
-    // if (outputPath.empty())
-    //     outputFile.open(options["-f"][inputFileIndex] + ".out", std::ofstream::out);
-
+    inputFile.open(files[inputFileIndex], std::ifstream::in);
+    outputFile.open(files[inputFileIndex] + ".structree", std::ofstream::out);
+    filename = parseFilename(files[inputFileIndex]);
     inputFileIndex++;
+
+    if (!inputFile) {
+        throw FileLoadException((std::string)("Can not open the file: ") + filename);
+    }
 
     return inputFile;
 }
@@ -136,35 +130,24 @@ const std::string& structree::Config::getFilename() {
 *   @last update: 2021/12/2
 */
 void structree::Config::parseArgus() {
-    if (options.find("-h") != options.end()) {
+    if (arguments.empty()) {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED);
+        std::cout << "No input files!" << std::endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
         Config::printUsage();
         exit(0);
     }
 
-    if (options.find("-f") == options.end()) {
-        std::cout << "No input file" << std::endl;
-        Config::printUsage();
-        exit(0);
-    }
-
-    // Check input files
-    for (const auto& args : options["-f"]) {
-        inputFile.open(args, std::ifstream::in);
-        if (!inputFile) {
-            std::cout << "Can not open the file: " << args << std::endl;
+    size_t argc = arguments.size();
+    for (size_t i = 0; i < argc; i++) {
+        if (arguments[i] == "-h") {
+            Config::printUsage();
             exit(0);
+        } else if (arguments[i][0] == '-') {
+        } else {
+            files.push_back(arguments[i]);
         }
-        inputFile.close();
     }
-
-    // if (options.find("-o") != options.end()) {
-    //     if (options["-o"].size() > 1) {
-    //         std::cout << "Too many arguments for option '-o'" << std::endl;
-    //         exit(0);
-    //     } else {
-    //         outputPath = options["-o"][0];
-    //     }
-    // }
 }
 
 
@@ -190,4 +173,21 @@ const std::string structree::Config::parseFilename(const std::string& filePath) 
     } else {
         return filePath.substr(pos + 1);
     }
+}
+
+
+
+/*
+*   @function: FileLoadException
+*   @brief: 文件加载异常的构造函数
+*   
+*   @author: Fantasime
+*
+*   @date: 2021/12/7
+*   @last update: 2021/12/7
+*/
+structree::FileLoadException::FileLoadException(const char* message) : runtime_error(message) {
+}
+
+structree::FileLoadException::FileLoadException(const std::string& message) : runtime_error(message) {
 }

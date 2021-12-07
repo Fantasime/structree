@@ -28,7 +28,7 @@ chmod +x ./build.sh
 
 ```bash
 Usage:
-  structree file... [options]
+  structree [options] files...
 Options:
   -h          Show usage
 ```

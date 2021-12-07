@@ -1,4 +1,6 @@
 #pragma once
+#include <Windows.h>
+
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -24,8 +26,11 @@ class Config {
   private:
     std::string::size_type inputFileIndex;
     std::string filename;
+
+    std::vector<std::string> arguments;
+    std::vector<std::string> files;
+
     std::map<std::string, std::vector<std::string>> options;  // option ---> arguments
-    // std::string outputPath;
     std::ifstream inputFile;
     std::ofstream outputFile;
 
@@ -46,6 +51,15 @@ class Config {
     void parseArgus();
 
     const std::string parseFilename(const std::string& filePath);
+};
+
+
+
+class FileLoadException : public std::runtime_error {
+  public:
+    FileLoadException(const char* message);
+
+    FileLoadException(const std::string& message);
 };
 
 }  // namespace structree
